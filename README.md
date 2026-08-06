@@ -63,7 +63,9 @@ The library uses a consistent, tidy topic scheme so your Node-RED flows stay cle
 
 Import [`node-red/example-flow.json`](node-red/example-flow.json) to get a matching
 flow: telemetry debug, LED test buttons, threshold setter, **and a live Dashboard**
-(temperature gauge + chart, online/offline indicator, LED toggle, threshold slider).
+(temperature gauge + chart, online/offline indicator, button + alarm status, LED
+toggle, threshold slider). The button/alarm indicators light up when you run the
+**SensorAndActuator** sketch.
 
 The dashboard uses **Dashboard 2.0** (`@flowfuse/node-red-dashboard`). Install it once via
 *Menu → Manage palette → Install → `@flowfuse/node-red-dashboard`*, then **Deploy** and open
