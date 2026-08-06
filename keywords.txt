@@ -1,0 +1,42 @@
+#######################################
+# Syntax Coloring Map for N-R_ESP32
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+NodeBridge	KEYWORD1
+Value	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+wifi	KEYWORD2
+broker	KEYWORD2
+login	KEYWORD2
+root	KEYWORD2
+heartbeat	KEYWORD2
+debug	KEYWORD2
+onConnect	KEYWORD2
+onDisconnect	KEYWORD2
+on	KEYWORD2
+begin	KEYWORD2
+loop	KEYWORD2
+send	KEYWORD2
+sendRaw	KEYWORD2
+connected	KEYWORD2
+deviceName	KEYWORD2
+asString	KEYWORD2
+asFloat	KEYWORD2
+asInt	KEYWORD2
+asLong	KEYWORD2
+asBool	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+NODEBRIDGE_MAX_SUBS	LITERAL1
+NODEBRIDGE_BUFFER_SIZE	LITERAL1

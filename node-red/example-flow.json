@@ -1,0 +1,107 @@
+[
+  {
+    "id": "nb_tab",
+    "type": "tab",
+    "label": "N-R_ESP32 Demo",
+    "disabled": false,
+    "info": "Companion flow for the N-R_ESP32 library examples. Set the broker node to your MQTT broker, then Deploy."
+  },
+  {
+    "id": "nb_broker",
+    "type": "mqtt-broker",
+    "name": "Local Broker",
+    "broker": "192.168.1.10",
+    "port": "1883",
+    "clientid": "node-red",
+    "keepalive": "60",
+    "cleansession": true
+  },
+  {
+    "id": "nb_in_all",
+    "type": "mqtt in",
+    "z": "nb_tab",
+    "name": "ESP32 telemetry",
+    "topic": "devices/esp32-demo/#",
+    "qos": "0",
+    "datatype": "auto",
+    "broker": "nb_broker",
+    "x": 160,
+    "y": 100,
+    "wires": [["nb_debug"]]
+  },
+  {
+    "id": "nb_debug",
+    "type": "debug",
+    "z": "nb_tab",
+    "name": "incoming",
+    "active": true,
+    "tosidebar": true,
+    "complete": "true",
+    "targetType": "full",
+    "x": 420,
+    "y": 100,
+    "wires": []
+  },
+  {
+    "id": "nb_led_on",
+    "type": "inject",
+    "z": "nb_tab",
+    "name": "LED on",
+    "props": [{ "p": "payload" }],
+    "payload": "on",
+    "payloadType": "str",
+    "x": 150,
+    "y": 200,
+    "wires": [["nb_led_out"]]
+  },
+  {
+    "id": "nb_led_off",
+    "type": "inject",
+    "z": "nb_tab",
+    "name": "LED off",
+    "props": [{ "p": "payload" }],
+    "payload": "off",
+    "payloadType": "str",
+    "x": 150,
+    "y": 250,
+    "wires": [["nb_led_out"]]
+  },
+  {
+    "id": "nb_led_out",
+    "type": "mqtt out",
+    "z": "nb_tab",
+    "name": "led/set",
+    "topic": "devices/esp32-demo/led/set",
+    "qos": "0",
+    "retain": "false",
+    "broker": "nb_broker",
+    "x": 420,
+    "y": 225,
+    "wires": []
+  },
+  {
+    "id": "nb_thr",
+    "type": "inject",
+    "z": "nb_tab",
+    "name": "threshold 28",
+    "props": [{ "p": "payload" }],
+    "payload": "28",
+    "payloadType": "num",
+    "x": 160,
+    "y": 320,
+    "wires": [["nb_thr_out"]]
+  },
+  {
+    "id": "nb_thr_out",
+    "type": "mqtt out",
+    "z": "nb_tab",
+    "name": "threshold/set",
+    "topic": "devices/esp32-demo/threshold/set",
+    "qos": "0",
+    "retain": "false",
+    "broker": "nb_broker",
+    "x": 440,
+    "y": 320,
+    "wires": []
+  }
+]
