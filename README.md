@@ -73,8 +73,9 @@ flow (telemetry debug + LED buttons + threshold setter).
 | Method | Purpose |
 |--------|---------|
 | `wifi(ssid, pass)` | WiFi credentials |
-| `broker(host, port=1883)` | MQTT broker address |
+| `broker(host, port=0)` | MQTT broker address (port 0 = auto: 8883 TLS / 1883 plain) |
 | `login(user, pass)` | MQTT username/password (if broker requires) |
+| `secure(rootCA=nullptr)` | enable TLS — required by HiveMQ Cloud & most cloud brokers |
 | `root(name)` | topic namespace root (default `"devices"`) |
 | `heartbeat(ms)` | publish rssi/uptime every `ms` (0 = off) |
 | `debug(true)` | print status to `Serial` |
@@ -108,11 +109,32 @@ bridge.on("threshold", [](Value v){ setpoint = v.asFloat(); });
 
 ---
 
+## Cloud brokers (HiveMQ Cloud, etc.)
+
+Cloud MQTT brokers require **TLS + username/password**. Add `.secure()` and `.login()`:
+
+```cpp
+bridge.wifi("SSID", "pass")
+      .broker("xxxxxxxx.s1.eu.hivemq.cloud")   // port auto-defaults to 8883
+      .secure()                                // TLS on
+      .login("hivemq-user", "hivemq-pass");
+bridge.begin("esp32-demo");
+```
+
+Point your Node-RED `mqtt-broker` node at the **same** cluster URL / port 8883, tick
+**Use TLS**, and enter the same username/password — both ends meet in the cloud.
+
+- `.secure()` encrypts but does **not** verify the broker's certificate (fine to start).
+- `.secure(rootCA)` verifies against a PEM root CA (HiveMQ Cloud uses Let's Encrypt /
+  ISRG Root X1). With validation on, sync the ESP32 clock via NTP first so cert-expiry
+  checks pass. See the **HiveMQCloud** example for the full pattern.
+
 ## Examples
 
 - **BasicTelemetry** — publish a reading every 2 s.
 - **ReceiveCommands** — toggle the onboard LED from Node-RED.
 - **SensorAndActuator** — the full picture: send data, receive commands, heartbeat, presence.
+- **HiveMQCloud** — connect to HiveMQ Cloud over TLS with username/password.
 
 ---
 

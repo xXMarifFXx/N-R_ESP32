@@ -84,6 +84,9 @@ NodeBridge& NodeBridge::broker(const char* host, uint16_t port) {
 NodeBridge& NodeBridge::login(const char* user, const char* password) {
   _user = user; _mpass = password; return *this;
 }
+NodeBridge& NodeBridge::secure(const char* rootCA) {
+  _tls = true; _caCert = rootCA; return *this;
+}
 NodeBridge& NodeBridge::root(const char* rootTopic) { _root = rootTopic; return *this; }
 NodeBridge& NodeBridge::heartbeat(unsigned long ms) { _hbInterval = ms; return *this; }
 NodeBridge& NodeBridge::debug(bool on) { _debug = on; return *this; }
@@ -108,6 +111,17 @@ NodeBridge& NodeBridge::on(const char* key, CommandHandler handler) {
 bool NodeBridge::begin(const char* deviceName) {
   _device = deviceName;
   _self   = this;
+
+  if (_port == 0) _port = _tls ? 8883 : 1883;   // auto-pick if not set
+
+  if (_tls) {
+    if (_caCert) _netSecure.setCACert(_caCert);  // validate against provided root CA
+    else         _netSecure.setInsecure();       // encrypted but unvalidated (quick start)
+    _mqtt.setClient(_netSecure);
+    _log("TLS enabled");
+  } else {
+    _mqtt.setClient(_net);
+  }
 
   _mqtt.setServer(_host, _port);
   _mqtt.setCallback(_trampoline);

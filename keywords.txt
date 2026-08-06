@@ -16,6 +16,7 @@ Value	KEYWORD1
 wifi	KEYWORD2
 broker	KEYWORD2
 login	KEYWORD2
+secure	KEYWORD2
 root	KEYWORD2
 heartbeat	KEYWORD2
 debug	KEYWORD2

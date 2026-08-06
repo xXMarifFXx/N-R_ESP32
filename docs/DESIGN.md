@@ -42,10 +42,22 @@ delivering a typed `Value`.
 - `loop()` re-checks WiFi (nudge every 5 s), retries MQTT every 3 s, drives `_mqtt.loop()`,
   emits heartbeat, and fires connect/disconnect edges exactly once.
 
+## TLS (added for cloud brokers)
+
+`.secure()` switches the transport from `WiFiClient` to `WiFiClientSecure` and is
+required by HiveMQ Cloud and most managed brokers (port 8883).
+
+- `begin()` selects the client via `_mqtt.setClient()` based on `_tls`.
+- `broker(host, port=0)` — port 0 means "auto": resolved to 8883 (TLS) or 1883 (plain)
+  in `begin()`, so users usually omit the port entirely.
+- `secure()` with no arg calls `setInsecure()` — encrypted but unvalidated (quick start).
+  `secure(rootCA)` calls `setCACert()` for real validation; requires a roughly-correct
+  clock (NTP) because TLS checks cert expiry.
+- Combine with `.login(user, pass)` for the username/password cloud brokers expect.
+
 ## Possible future work
 
 - Optional QoS-1 publishes / persistent session.
-- TLS (WiFiClientSecure) variant for cloud brokers.
 - Auto-discovery payload so Node-RED can enumerate devices.
 - Batching multiple keys into one message.
 - Compile-time check example under CI (arduino-cli) — see build note below.

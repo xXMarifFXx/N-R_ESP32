@@ -19,6 +19,7 @@
 
 #include <Arduino.h>
 #include <WiFi.h>
+#include <WiFiClientSecure.h>
 #include <PubSubClient.h>
 
 #ifndef NODEBRIDGE_MAX_SUBS
@@ -67,8 +68,13 @@ public:
 
   // ---- configuration (chainable; call before begin) ---------------------
   NodeBridge& wifi(const char* ssid, const char* password);
-  NodeBridge& broker(const char* host, uint16_t port = 1883);
+  NodeBridge& broker(const char* host, uint16_t port = 0);     // 0 = auto (8883 TLS / 1883 plain)
   NodeBridge& login(const char* user, const char* password);   // optional MQTT auth
+
+  // Enable TLS (required by HiveMQ Cloud and most cloud brokers, port 8883).
+  //   secure()          -> encrypted, server cert NOT validated (quick start)
+  //   secure(rootCA)     -> encrypted + validated against the PEM root CA you pass
+  NodeBridge& secure(const char* rootCA = nullptr);
   NodeBridge& root(const char* rootTopic);                     // default "devices"
   NodeBridge& heartbeat(unsigned long intervalMs);             // 0 = off (default)
   NodeBridge& debug(bool on = true);                           // log to Serial
@@ -106,18 +112,21 @@ private:
   struct Sub { const char* key; CommandHandler handler; };
 
   // wiring
-  WiFiClient   _net;
-  PubSubClient _mqtt;
+  WiFiClient       _net;         // plain transport
+  WiFiClientSecure _netSecure;   // TLS transport
+  PubSubClient     _mqtt;
 
   // config
   const char* _ssid   = nullptr;
   const char* _pass   = nullptr;
   const char* _host   = nullptr;
-  uint16_t    _port   = 1883;
+  uint16_t    _port   = 0;        // 0 = auto-pick from _tls in begin()
   const char* _user   = nullptr;
   const char* _mpass  = nullptr;
   const char* _root   = "devices";
   const char* _device = "esp32";
+  bool          _tls    = false;
+  const char*   _caCert = nullptr;
   bool          _debug         = false;
   unsigned long _hbInterval    = 0;
   unsigned long _lastHb        = 0;
