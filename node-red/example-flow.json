@@ -4,15 +4,17 @@
     "type": "tab",
     "label": "N-R_ESP32 Demo",
     "disabled": false,
-    "info": "Companion flow for the N-R_ESP32 library examples. Set the broker node to your MQTT broker, then Deploy."
+    "info": "Companion flow for the N-R_ESP32 library examples.\n\nSetup:\n1. Double-click any MQTT node, edit the 'HiveMQ Cloud' broker.\n2. Connection tab: set Server to your cluster URL, Port 8883, tick 'Enable secure (SSL/TLS) connection'. Keep Client ID different from the ESP32's device name.\n3. Security tab: enter your HiveMQ username + password.\n4. Deploy. Watch the debug sidebar; use the inject nodes to send led/threshold.\n\nFor a LOCAL broker instead: set Port 1883 and untick TLS."
   },
   {
     "id": "nb_broker",
     "type": "mqtt-broker",
-    "name": "Local Broker",
-    "broker": "192.168.1.10",
-    "port": "1883",
+    "name": "HiveMQ Cloud",
+    "broker": "YOUR-CLUSTER.s1.eu.hivemq.cloud",
+    "port": "8883",
     "clientid": "node-red",
+    "usetls": true,
+    "protocolVersion": "4",
     "keepalive": "60",
     "cleansession": true
   },
