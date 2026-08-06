@@ -154,6 +154,12 @@ Point your Node-RED `mqtt-broker` node at the **same** cluster URL / port 8883, 
 - `String` keys/values are fine; keys passed to `on()`/`send()` should be string
   literals or otherwise stay in scope.
 
+## Teaching a class with this?
+
+See **[docs/TEACHING.md](docs/TEACHING.md)** — how to pre-warm the compile cache so
+builds are fast in class, Windows Defender exclusions, and HiveMQ Cloud classroom
+gotchas (unique device names, the free-tier connection limit, port 8883).
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
