@@ -62,7 +62,12 @@ The library uses a consistent, tidy topic scheme so your Node-RED flows stay cle
 `devices` is the default namespace root; change it with `.root("myfleet")`.
 
 Import [`node-red/example-flow.json`](node-red/example-flow.json) to get a matching
-flow (telemetry debug + LED buttons + threshold setter).
+flow: telemetry debug, LED test buttons, threshold setter, **and a live Dashboard**
+(temperature gauge + chart, online/offline indicator, LED toggle, threshold slider).
+
+The dashboard uses the **node-red-dashboard** palette. Install it once via
+*Menu → Manage palette → Install → `node-red-dashboard`*, then **Deploy** and open
+`http://<node-red-host>:1880/ui`.
 
 ---
 
