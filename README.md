@@ -65,9 +65,9 @@ Import [`node-red/example-flow.json`](node-red/example-flow.json) to get a match
 flow: telemetry debug, LED test buttons, threshold setter, **and a live Dashboard**
 (temperature gauge + chart, online/offline indicator, LED toggle, threshold slider).
 
-The dashboard uses the **node-red-dashboard** palette. Install it once via
-*Menu → Manage palette → Install → `node-red-dashboard`*, then **Deploy** and open
-`http://<node-red-host>:1880/ui`.
+The dashboard uses **Dashboard 2.0** (`@flowfuse/node-red-dashboard`). Install it once via
+*Menu → Manage palette → Install → `@flowfuse/node-red-dashboard`*, then **Deploy** and open
+`http://<node-red-host>:1880/dashboard`.
 
 ---
 
