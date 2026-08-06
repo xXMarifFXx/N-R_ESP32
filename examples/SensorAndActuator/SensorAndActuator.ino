@@ -42,9 +42,13 @@ void setup() {
   bridge.on("threshold", [](Value v) {
     threshold = v.asFloat();
     Serial.printf("New threshold: %.1f\n", threshold);
+    bridge.send("threshold", threshold);      // echo back the value we adopted
   });
 
-  bridge.onConnect([]() { Serial.println("** linked to Node-RED **"); });
+  bridge.onConnect([]() {
+    Serial.println("** linked to Node-RED **");
+    bridge.send("threshold", threshold);      // publish current setpoint on connect
+  });
 
   bridge.begin("esp32-demo");
 }

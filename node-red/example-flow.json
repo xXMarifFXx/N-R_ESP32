@@ -404,6 +404,57 @@
     "wires": [["nb_thr_out"]]
   },
   {
+    "id": "nb_in_thr",
+    "type": "mqtt in",
+    "z": "nb_tab",
+    "name": "threshold (confirmed)",
+    "topic": "devices/esp32-demo/threshold",
+    "qos": "0",
+    "datatype": "auto",
+    "broker": "nb_broker",
+    "x": 170,
+    "y": 740,
+    "wires": [["nb_ex_thr"]]
+  },
+  {
+    "id": "nb_ex_thr",
+    "type": "change",
+    "z": "nb_tab",
+    "name": "payload = value",
+    "rules": [
+      { "t": "set", "p": "payload", "pt": "msg", "to": "payload.value", "tot": "msg" }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 400,
+    "y": 740,
+    "wires": [["nb_txt_thr"]]
+  },
+  {
+    "id": "nb_txt_thr",
+    "type": "ui-text",
+    "z": "nb_tab",
+    "group": "nb_grp_ctrl",
+    "order": 3,
+    "width": 0,
+    "height": 0,
+    "name": "Device threshold",
+    "label": "Device set to",
+    "format": "{{msg.payload}} °C",
+    "layout": "row-spread",
+    "style": false,
+    "font": "",
+    "fontSize": 16,
+    "color": "#717171",
+    "className": "",
+    "x": 620,
+    "y": 740,
+    "wires": []
+  },
+  {
     "id": "nb_led_out",
     "type": "mqtt out",
     "z": "nb_tab",
