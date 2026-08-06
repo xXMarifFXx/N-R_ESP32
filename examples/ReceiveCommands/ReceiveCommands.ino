@@ -5,6 +5,9 @@
       devices/esp32-demo/led/set
   Send "on" / "off" (or true/false, 1/0), or JSON {"value":"on"}.
 
+  Plain LOCAL broker (no TLS/login). For HiveMQ Cloud or any cloud broker,
+  see the "HiveMQCloud" example, or add .secure().login(...) to the config.
+
   Library: N-R_ESP32   (needs PubSubClient installed)
 */
 

@@ -8,6 +8,9 @@
   This is the "focus on your algorithm" example - notice how little plumbing
   there is. Everything below setup() is your logic.
 
+  Broker is plain/local here. For HiveMQ Cloud add .secure() and fill in
+  .login(...) below (see the "HiveMQCloud" example for the full pattern).
+
   Library: N-R_ESP32   (needs PubSubClient installed)
 */
 

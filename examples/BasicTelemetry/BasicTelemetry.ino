@@ -1,6 +1,10 @@
 /*
   BasicTelemetry - publish a sensor reading to Node-RED every 2 seconds.
 
+  This is the minimal example: a PLAIN, LOCAL broker with NO TLS and NO login.
+  >> Using HiveMQ Cloud (or any cloud broker)? It needs TLS + username/password.
+  >> Use the "HiveMQCloud" example instead, or add .secure().login(...) below.
+
   Node-RED: add an MQTT-in node subscribed to  devices/esp32-demo/temperature
   Its msg.payload will be JSON: {"value":24.5,"device":"esp32-demo","ts":12345}
 
