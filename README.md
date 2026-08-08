@@ -153,6 +153,12 @@ Point your Node-RED `mqtt-broker` node at the **same** cluster URL / port 8883, 
 - Max payload 512 bytes by default — raise with `#define NODEBRIDGE_BUFFER_SIZE 1024`.
 - `String` keys/values are fine; keys passed to `on()`/`send()` should be string
   literals or otherwise stay in scope.
+- **Config strings must outlive the bridge.** `wifi()`, `broker()`, `login()`, `root()`
+  and `begin()` store the *pointer* you pass, not a copy — use string literals or
+  variables that stay in scope (don't pass a temporary `String::c_str()`).
+- **For production TLS, validate the certificate.** `secure()` with no argument does
+  *not* verify the broker (MITM-able); pass `secure(rootCA)` and sync the clock via NTP.
+  The library logs a warning when running unvalidated.
 
 ## Teaching a class with this?
 

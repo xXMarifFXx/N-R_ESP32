@@ -1,0 +1,14 @@
+{
+  "lastAuditCommit": "33af29b137b4a6f8541754c45d6948ec3d608f05",
+  "lastFullAuditCommit": "33af29b137b4a6f8541754c45d6948ec3d608f05",
+  "auditDate": "2026-08-08",
+  "verdict": "GO",
+  "verifiedGood": [
+    "src/NodeBridge.cpp: buffer bounds (snprintf/memcpy caps)",
+    "src/NodeBridge.cpp: millis() rollover handling",
+    "no committed secrets",
+    "MIT license compatibility with PubSubClient",
+    "clean compile -Wall -Wextra on esp32 3.3.11 and arduino:esp32 2.0.18",
+    "LWT presence"
+  ]
+}
