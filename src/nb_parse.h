@@ -36,8 +36,14 @@ inline void extractValue(const char* payload, char* out, size_t n) {
   const char* end   = nullptr;
 
   if (*p == '{') {                                  // looks like JSON
-    const char* key = strstr(p, "\"value\"");
-    const char* c   = key ? strchr(key, ':') : nullptr;
+    // Find "value" used as a KEY: the token must be followed (after optional
+    // spaces) by ':'. This ignores "value" appearing as a string value elsewhere.
+    const char* c = nullptr;
+    for (const char* q = strstr(p, "\"value\""); q; q = strstr(q + 7, "\"value\"")) {
+      const char* a = q + 7;                        // just past  "value"
+      while (*a == ' ' || *a == '\t') a++;
+      if (*a == ':') { c = a; break; }
+    }
     if (c) {
       c++;
       while (*c == ' ' || *c == '\t') c++;

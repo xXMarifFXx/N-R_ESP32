@@ -3,6 +3,19 @@
 All notable changes to **N-R_ESP32** are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versions are semver.
 
+## [1.0.3] - 2026-08-08
+### Fixed
+- `extractValue` now matches `"value"` only as a JSON **key** (followed by `:`), so a
+  `"value"` appearing as someone else's string value no longer false-matches.
+- `Value::asBool` uses strict exact-match of `1/true/on/yes` (case-insensitive); inputs
+  like `"10"` or `"1.5"` are now correctly `false` instead of `true`.
+### Changed
+- `begin()` logs a warning if a second `NodeBridge` instance is started (previously silent).
+- `depends=PubSubClient (>=2.8)`; README documents the tested version (2.8.0) and that
+  publishing inside an `on()` handler is safe (payload is copied before dispatch).
+### Tests
+- Added parser cases for the `"value"`-substring fix (now 15 `extractValue` cases).
+
 ## [1.0.2] - 2026-08-08
 ### Changed
 - **Reliability:** bound the blocking MQTT connect with `setSocketTimeout(5)` so an
@@ -30,6 +43,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versions are sem
   presence (LWT), optional heartbeat. TLS + username/password for cloud brokers
   (HiveMQ Cloud). Only dependency: PubSubClient. Four examples.
 
+[1.0.3]: https://github.com/xXMarifFXx/N-R_ESP32/compare/1.0.2...1.0.3
 [1.0.2]: https://github.com/xXMarifFXx/N-R_ESP32/compare/1.0.1...1.0.2
 [1.0.1]: https://github.com/xXMarifFXx/N-R_ESP32/compare/1.0.0...1.0.1
 [1.0.0]: https://github.com/xXMarifFXx/N-R_ESP32/releases/tag/1.0.0

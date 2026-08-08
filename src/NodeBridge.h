@@ -44,7 +44,7 @@ public:
   int         asInt()    const { return atoi(_raw); }
   long        asLong()   const { return atol(_raw); }
   bool asBool() const {
-    return  _raw[0] == '1' ||
+    return  !strcasecmp(_raw, "1")    ||
             !strcasecmp(_raw, "true") ||
             !strcasecmp(_raw, "on")   ||
             !strcasecmp(_raw, "yes");

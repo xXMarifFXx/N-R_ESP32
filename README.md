@@ -147,7 +147,11 @@ Point your Node-RED `mqtt-broker` node at the **same** cluster URL / port 8883, 
 
 ## Notes / limits
 
-- Create **one** `NodeBridge` instance (it registers a single MQTT callback).
+- Create **one** `NodeBridge` instance (it registers a single MQTT callback). A second
+  instance logs a warning and won't receive commands.
+- Publishing from inside an `on()` handler is safe — the incoming payload is copied
+  before your handler runs, so `send()` inside a handler won't corrupt it.
+- Tested with **PubSubClient 2.8.0**.
 - Up to 16 `on()` handlers by default — raise with
   `#define NODEBRIDGE_MAX_SUBS 32` before `#include`.
 - Max payload 512 bytes by default — raise with `#define NODEBRIDGE_BUFFER_SIZE 1024`.

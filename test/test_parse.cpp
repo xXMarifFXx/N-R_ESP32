@@ -40,7 +40,11 @@ int main() {
   checkExtract("{\"value\":true}", "true");
   checkExtract("{ \"value\" : 28 }", "28");
   checkExtract("{\"value\":\"on\",\"device\":\"x\"}", "on");
-  checkExtract("{\"other\":1}", "{\"other\":1}");   // no value key -> whole payload
+  checkExtract("{\"other\":1}", "{\"other\":1}");            // no value key -> whole payload
+  checkExtract("{\"other\":\"value\"}", "{\"other\":\"value\"}"); // "value" as a value, not a key
+  checkExtract("{\"note\":\"x\",\"value\":5}", "5");         // value key after another field
+  checkExtract("{\"myvalue\":9}", "{\"myvalue\":9}");        // "myvalue" must not match "value"
+  checkExtract("{ \"value\" :7}", "7");                      // spaces before colon still match
 
   printf("jsonQuote:\n");
   checkQuote("hi", "\"hi\"");

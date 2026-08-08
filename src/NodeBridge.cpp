@@ -50,6 +50,8 @@ NodeBridge& NodeBridge::on(const char* key, CommandHandler handler) {
 
 bool NodeBridge::begin(const char* deviceName) {
   _device = deviceName;
+  if (_self != nullptr && _self != this)
+    _log("WARNING: multiple NodeBridge instances - only the last begin() receives commands");
   _self   = this;
 
   if (_port == 0) _port = _tls ? 8883 : 1883;   // auto-pick if not set

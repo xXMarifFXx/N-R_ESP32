@@ -42,7 +42,7 @@ void setup() {
   bridge.on("threshold", [](Value v) {
     threshold = v.asFloat();
     Serial.printf("New threshold: %.1f\n", threshold);
-    bridge.send("threshold", threshold);      // echo back the value we adopted
+    bridge.send("threshold", threshold);      // safe: payload is copied before this runs
   });
 
   bridge.onConnect([]() {
