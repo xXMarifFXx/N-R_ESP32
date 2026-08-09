@@ -46,6 +46,20 @@ int main() {
   checkExtract("{\"myvalue\":9}", "{\"myvalue\":9}");        // "myvalue" must not match "value"
   checkExtract("{ \"value\" :7}", "7");                      // spaces before colon still match
 
+  printf("matchSetTopic:\n");
+  { const char* k; size_t kl;
+    bool ok = nbparse::matchSetTopic("devices/esp32-demo/led/set", "devices", "esp32-demo", &k, &kl);
+    bool good = ok && kl == 3 && !strncmp(k, "led", 3);
+    printf("  led/set -> %s (len %zu)%s\n", ok ? "match" : "no", ok ? kl : 0, good ? "" : "   << MISMATCH");
+    if (!good) fails++;
+  }
+  { const char* k; size_t kl;
+    if (nbparse::matchSetTopic("devices/other/led/set", "devices", "esp32-demo", &k, &kl)) { printf("  wrong device matched << MISMATCH\n"); fails++; }
+    else printf("  wrong device rejected\n");
+    if (nbparse::matchSetTopic("devices/esp32-demo/temperature", "devices", "esp32-demo", &k, &kl)) { printf("  missing /set matched << MISMATCH\n"); fails++; }
+    else printf("  telemetry (no /set) rejected\n");
+  }
+
   printf("jsonQuote:\n");
   checkQuote("hi", "\"hi\"");
   checkQuote("a\"b", "\"a\\\"b\"");

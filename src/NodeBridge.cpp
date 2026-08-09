@@ -91,12 +91,15 @@ bool NodeBridge::begin(const char* deviceName) {
 }
 
 void NodeBridge::loop() {
-  if (WiFi.status() != WL_CONNECTED) {
+  bool wifi = (WiFi.status() == WL_CONNECTED);
+  bool mqtt = false;
+
+  if (!wifi) {
     _ensureWifi();
-  } else if (!_mqtt.connected()) {
+  } else if (!(mqtt = _mqtt.connected())) {
     if (millis() - _lastReconnect > 3000) {
       _lastReconnect = millis();
-      _ensureMqtt();
+      mqtt = _ensureMqtt();
     }
   } else {
     _mqtt.loop();
@@ -112,8 +115,8 @@ void NodeBridge::loop() {
     }
   }
 
-  // fire connect / disconnect edge events exactly once
-  bool now = connected();
+  // fire connect / disconnect edge events exactly once (reuse states above)
+  bool now = wifi && mqtt;
   if (now && !_wasConnected) { _wasConnected = true;  if (_onConnect)    _onConnect(); }
   if (!now && _wasConnected) { _wasConnected = false; if (_onDisconnect) _onDisconnect(); }
 }
@@ -175,26 +178,28 @@ void NodeBridge::_trampoline(char* topic, uint8_t* payload, unsigned int len) {
 }
 
 void NodeBridge::_handleMessage(char* topic, uint8_t* payload, unsigned int len) {
-  for (uint8_t i = 0; i < _subCount; ++i) {
-    char expect[160];
-    _topic(expect, sizeof(expect), _subs[i].key, "set");
-    if (strcmp(topic, expect) != 0) continue;
+  // Expected topic: <root>/<device>/<key>/set. Resolve the <key> segment once
+  // (not once per subscription), then match it to a handler.
+  const char* mid; size_t keylen;
+  if (!nbparse::matchSetTopic(topic, _root, _device, &mid, &keylen)) return;
 
-    char raw[NODEBRIDGE_BUFFER_SIZE];
-    unsigned int n = len < sizeof(raw) - 1 ? len : sizeof(raw) - 1;
-    memcpy(raw, payload, n);
-    raw[n] = '\0';
+  int idx = -1;
+  for (uint8_t i = 0; i < _subCount; ++i)
+    if (strncmp(mid, _subs[i].key, keylen) == 0 && _subs[i].key[keylen] == '\0') { idx = i; break; }
+  if (idx < 0) return;
 
-    char value[NODEBRIDGE_BUFFER_SIZE];
-    nbparse::extractValue(raw, value, sizeof(value));
+  // One buffer: copy the payload, then extract the value in place (no 2nd buffer).
+  char raw[NODEBRIDGE_BUFFER_SIZE];
+  unsigned int n = len < sizeof(raw) - 1 ? len : sizeof(raw) - 1;
+  memcpy(raw, payload, n);
+  raw[n] = '\0';
+  const char* value = nbparse::extractValueInPlace(raw);
 
-    if (_debug) {
-      Serial.print(F("[NodeBridge] cmd ")); Serial.print(_subs[i].key);
-      Serial.print(F(" = "));               Serial.println(value);
-    }
-    if (_subs[i].handler) _subs[i].handler(Value(value));
-    return;
+  if (_debug) {
+    Serial.print(F("[NodeBridge] cmd ")); Serial.print(_subs[idx].key);
+    Serial.print(F(" = "));               Serial.println(value);
   }
+  if (_subs[idx].handler) _subs[idx].handler(Value(value));
 }
 
 // ---------------------------------------------------------------------------

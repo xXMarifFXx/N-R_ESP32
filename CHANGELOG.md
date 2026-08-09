@@ -3,6 +3,22 @@
 All notable changes to **N-R_ESP32** are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versions are semver.
 
+## [1.0.4] - 2026-08-09
+### Changed (performance / efficiency)
+- `_handleMessage` resolves the `<key>` segment **once** per incoming command
+  (new pure `nbparse::matchSetTopic`) instead of rebuilding the expected topic
+  once *per subscription* — fewer `snprintf` calls per command.
+- Command value is now extracted **in place** (`nbparse::extractValueInPlace`),
+  dropping the second ~512-byte stack buffer in the MQTT callback (~halves that
+  callback's peak stack; static flash/RAM essentially unchanged).
+- `loop()` reuses the WiFi/MQTT state it already read for the connect/disconnect
+  edge check instead of recomputing `connected()`.
+### Added
+- `MosquittoTLS` example: connect to a self-hosted Mosquitto/VPS broker with full
+  certificate validation (Let's Encrypt / ISRG Root X1) + NTP time sync.
+### Tests
+- Host tests for `matchSetTopic` (topic routing) added; parser suite unchanged and green.
+
 ## [1.0.3] - 2026-08-08
 ### Fixed
 - `extractValue` now matches `"value"` only as a JSON **key** (followed by `:`), so a
@@ -43,6 +59,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versions are sem
   presence (LWT), optional heartbeat. TLS + username/password for cloud brokers
   (HiveMQ Cloud). Only dependency: PubSubClient. Four examples.
 
+[1.0.4]: https://github.com/xXMarifFXx/N-R_ESP32/compare/1.0.3...1.0.4
 [1.0.3]: https://github.com/xXMarifFXx/N-R_ESP32/compare/1.0.2...1.0.3
 [1.0.2]: https://github.com/xXMarifFXx/N-R_ESP32/compare/1.0.1...1.0.2
 [1.0.1]: https://github.com/xXMarifFXx/N-R_ESP32/compare/1.0.0...1.0.1
