@@ -166,6 +166,11 @@ Ready-to-run examples for every sensor/actuator in the **Grove Starter Kit for X
 Each pulls one sensor library (DHT20, LIS3DHTR, ESP32Servo, Adafruit NeoPixel, IRremote,
 or U8g2) — the IDE offers to install it. See [docs/XIAO_GROVE.md](docs/XIAO_GROVE.md) for wiring.
 
+The Node-RED flow ([`node-red/example-flow.json`](node-red/example-flow.json)) now has a
+second dashboard page, **XIAO Kit**, with live widgets for every module: humidity / light /
+rotary gauges, a 3-axis acceleration chart, motion + IR readouts, and controls for the servo,
+buzzer, RGB strip (R/G/B sliders) and OLED text.
+
 ---
 
 ## Notes / limits
