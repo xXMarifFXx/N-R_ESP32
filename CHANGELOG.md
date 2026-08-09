@@ -3,6 +3,16 @@
 All notable changes to **N-R_ESP32** are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versions are semver.
 
+## [1.1.0] - 2026-08-09
+### Added — Seeed Studio XIAO + Grove Starter Kit examples
+- Ten new compile-verified examples for the **Grove Starter Kit for XIAO** (SKU 110010044)
+  on the XIAO Expansion Board, covering every module:
+  GroveTempHumidity (DHT20), GroveAccelerometer (LIS3DHTR), GroveLightSensor,
+  GroveRotaryAngle, GrovePIRMotion, GroveIRReceiver, GroveServo, GroveRGBStrip (WS2813),
+  ExpansionBuzzer, ExpansionOLED (SSD1306).
+- `docs/XIAO_GROVE.md` — board support (C3/S3/C6), pin cheat-sheet, module→library map, Node-RED topics.
+- All ten verified compiling on `esp32:esp32:XIAO_ESP32C3` and `XIAO_ESP32S3` (core 3.3.11).
+
 ## [1.0.4] - 2026-08-09
 ### Changed (performance / efficiency)
 - `_handleMessage` resolves the `<key>` segment **once** per incoming command
@@ -59,6 +69,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versions are sem
   presence (LWT), optional heartbeat. TLS + username/password for cloud brokers
   (HiveMQ Cloud). Only dependency: PubSubClient. Four examples.
 
+[1.1.0]: https://github.com/xXMarifFXx/N-R_ESP32/compare/1.0.4...1.1.0
 [1.0.4]: https://github.com/xXMarifFXx/N-R_ESP32/compare/1.0.3...1.0.4
 [1.0.3]: https://github.com/xXMarifFXx/N-R_ESP32/compare/1.0.2...1.0.3
 [1.0.2]: https://github.com/xXMarifFXx/N-R_ESP32/compare/1.0.1...1.0.2

@@ -142,6 +142,29 @@ Point your Node-RED `mqtt-broker` node at the **same** cluster URL / port 8883, 
 - **ReceiveCommands** — toggle the onboard LED from Node-RED.
 - **SensorAndActuator** — the full picture: send data, receive commands, heartbeat, presence.
 - **HiveMQCloud** — connect to HiveMQ Cloud over TLS with username/password.
+- **MosquittoTLS** — connect to your own broker with full certificate validation (ISRG Root X1) + NTP.
+
+### Seeed Studio XIAO + Grove Starter Kit
+
+Ready-to-run examples for every sensor/actuator in the **Grove Starter Kit for XIAO**
+(SKU 110010044), on the **XIAO Expansion Board**. All verified compiling on
+`XIAO_ESP32C3` and `XIAO_ESP32S3`. Sensors `send()`; actuators subscribe via `on()`.
+
+| Example | Grove module | Port | MQTT |
+|---------|--------------|------|------|
+| **GroveTempHumidity** | Temp & Humidity V2.0 (DHT20) | I²C | → `temperature`, `humidity` |
+| **GroveAccelerometer** | 3-Axis Accelerometer (LIS3DHTR) | I²C | → `accel_x/y/z` |
+| **GroveLightSensor** | Light Sensor v1.2 | A0 | → `light` |
+| **GroveRotaryAngle** | Rotary Angle Sensor | A0 | → `rotary` |
+| **GrovePIRMotion** | Mini PIR Motion | D0 | → `motion` |
+| **GroveIRReceiver** | IR Receiver + 20-key remote | D0 | → `ir_key` |
+| **GroveServo** | Servo | D0 | ← `servo/set` (0–180) |
+| **GroveRGBStrip** | WS2813 RGB strip | D0 | ← `color/set` ("R,G,B"/"off") |
+| **ExpansionBuzzer** | onboard buzzer | D3 | ← `buzzer/set` ("on"/"off"/Hz) |
+| **ExpansionOLED** | onboard OLED (SSD1306) | I²C | ← `text/set` (shows text) |
+
+Each pulls one sensor library (DHT20, LIS3DHTR, ESP32Servo, Adafruit NeoPixel, IRremote,
+or U8g2) — the IDE offers to install it. See [docs/XIAO_GROVE.md](docs/XIAO_GROVE.md) for wiring.
 
 ---
 
