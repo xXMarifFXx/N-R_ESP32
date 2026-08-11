@@ -3,6 +3,13 @@
 All notable changes to **N-R_ESP32** are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versions are semver.
 
+## [1.1.1] - 2026-08-11
+### Added
+- `keepAlive(seconds)` to tune the MQTT keep-alive, and raised the default from
+  PubSubClient's 15 s to **60 s** — the connection tolerates longer gaps before the
+  broker drops it. With `loop()` running, NodeBridge keeps the link up (and auto-reconnects
+  if it ever drops), so it stays live until you power the device off.
+
 ## [1.1.0] - 2026-08-09
 ### Added — Seeed Studio XIAO + Grove Starter Kit examples
 - Ten new compile-verified examples for the **Grove Starter Kit for XIAO** (SKU 110010044)
@@ -69,6 +76,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versions are sem
   presence (LWT), optional heartbeat. TLS + username/password for cloud brokers
   (HiveMQ Cloud). Only dependency: PubSubClient. Four examples.
 
+[1.1.1]: https://github.com/xXMarifFXx/N-R_ESP32/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/xXMarifFXx/N-R_ESP32/compare/1.0.4...1.1.0
 [1.0.4]: https://github.com/xXMarifFXx/N-R_ESP32/compare/1.0.3...1.0.4
 [1.0.3]: https://github.com/xXMarifFXx/N-R_ESP32/compare/1.0.2...1.0.3

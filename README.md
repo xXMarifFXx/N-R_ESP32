@@ -85,6 +85,7 @@ The dashboard uses **Dashboard 2.0** (`@flowfuse/node-red-dashboard`). Install i
 | `secure(rootCA=nullptr)` | enable TLS — required by HiveMQ Cloud & most cloud brokers |
 | `root(name)` | topic namespace root (default `"devices"`) |
 | `heartbeat(ms)` | publish rssi/uptime every `ms` (0 = off) |
+| `keepAlive(sec)` | MQTT keep-alive in seconds (default 60). Higher = tolerates longer gaps before the broker drops the device. With `loop()` running the link stays up until power-off. |
 | `debug(true)` | print status to `Serial` |
 | `onConnect(fn)` / `onDisconnect(fn)` | link/unlink callbacks |
 | `on(key, handler)` | subscribe to a command from Node-RED |

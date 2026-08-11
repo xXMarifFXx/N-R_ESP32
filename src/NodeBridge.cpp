@@ -29,6 +29,7 @@ NodeBridge& NodeBridge::secure(const char* rootCA) {
 }
 NodeBridge& NodeBridge::root(const char* rootTopic) { _root = rootTopic; return *this; }
 NodeBridge& NodeBridge::heartbeat(unsigned long ms) { _hbInterval = ms; return *this; }
+NodeBridge& NodeBridge::keepAlive(uint16_t seconds) { _keepAlive = seconds ? seconds : 60; return *this; }
 NodeBridge& NodeBridge::debug(bool on) { _debug = on; return *this; }
 NodeBridge& NodeBridge::onConnect(EventHandler cb) { _onConnect = cb; return *this; }
 NodeBridge& NodeBridge::onDisconnect(EventHandler cb) { _onDisconnect = cb; return *this; }
@@ -73,6 +74,7 @@ bool NodeBridge::begin(const char* deviceName) {
   _mqtt.setCallback(_trampoline);
   _mqtt.setBufferSize(NODEBRIDGE_BUFFER_SIZE);
   _mqtt.setSocketTimeout(5);                      // bound blocking connect/read so loop() stays responsive
+  _mqtt.setKeepAlive(_keepAlive);                 // how long the broker waits before declaring us gone
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(_ssid, _pass);

@@ -77,6 +77,7 @@ public:
   NodeBridge& secure(const char* rootCA = nullptr);
   NodeBridge& root(const char* rootTopic);                     // default "devices"
   NodeBridge& heartbeat(unsigned long intervalMs);             // 0 = off (default)
+  NodeBridge& keepAlive(uint16_t seconds);                     // MQTT keep-alive (default 60s)
   NodeBridge& debug(bool on = true);                           // log to Serial
 
   NodeBridge& onConnect(EventHandler cb);
@@ -128,6 +129,7 @@ private:
   bool          _tls    = false;
   const char*   _caCert = nullptr;
   bool          _debug         = false;
+  uint16_t      _keepAlive     = 60;   // seconds; higher = tolerates longer gaps before the broker drops us
   unsigned long _hbInterval    = 0;
   unsigned long _lastHb        = 0;
   unsigned long _lastReconnect = 0;
