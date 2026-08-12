@@ -51,6 +51,11 @@ NodeBridge& NodeBridge::on(const char* key, CommandHandler handler) {
 
 bool NodeBridge::begin(const char* deviceName) {
   _device = deviceName;
+  // Unique MQTT client id = device name + this board's chip id, so two boards that
+  // share a device name never kick each other off the broker. Presence topics still
+  // use the device name.
+  snprintf(_clientId, sizeof(_clientId), "%s-%06X", _device,
+           (unsigned)(ESP.getEfuseMac() & 0xFFFFFF));
   if (_self != nullptr && _self != this)
     _log("WARNING: multiple NodeBridge instances - only the last begin() receives commands");
   _self   = this;
@@ -149,8 +154,8 @@ bool NodeBridge::_ensureMqtt() {
 
   // Last Will: broker publishes "offline" (retained) if we drop unexpectedly.
   bool ok = _user
-    ? _mqtt.connect(_device, _user, _mpass, statusTopic, 0, true, "offline")
-    : _mqtt.connect(_device, nullptr, nullptr, statusTopic, 0, true, "offline");
+    ? _mqtt.connect(_clientId, _user, _mpass, statusTopic, 0, true, "offline")
+    : _mqtt.connect(_clientId, nullptr, nullptr, statusTopic, 0, true, "offline");
 
   if (ok) {
     _log("MQTT connected");

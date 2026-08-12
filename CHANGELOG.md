@@ -3,6 +3,13 @@
 All notable changes to **N-R_ESP32** are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versions are semver.
 
+## [1.1.2] - 2026-08-11
+### Fixed
+- **Unique client id per board.** The MQTT client id is now `<device>-<chipid>` instead of
+  just the device name, so two boards that share a device name (very common when students
+  copy the same example) no longer kick each other off the broker — the classic cause of
+  periodic disconnects. Presence topics still use the device name.
+
 ## [1.1.1] - 2026-08-11
 ### Added
 - `keepAlive(seconds)` to tune the MQTT keep-alive, and raised the default from
@@ -76,6 +83,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versions are sem
   presence (LWT), optional heartbeat. TLS + username/password for cloud brokers
   (HiveMQ Cloud). Only dependency: PubSubClient. Four examples.
 
+[1.1.2]: https://github.com/xXMarifFXx/N-R_ESP32/compare/1.1.1...1.1.2
 [1.1.1]: https://github.com/xXMarifFXx/N-R_ESP32/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/xXMarifFXx/N-R_ESP32/compare/1.0.4...1.1.0
 [1.0.4]: https://github.com/xXMarifFXx/N-R_ESP32/compare/1.0.3...1.0.4

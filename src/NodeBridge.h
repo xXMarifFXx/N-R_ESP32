@@ -126,6 +126,7 @@ private:
   const char* _mpass  = nullptr;
   const char* _root   = "devices";
   const char* _device = "esp32";
+  char        _clientId[48] = {0};   // <device>-<chipid>, unique per board
   bool          _tls    = false;
   const char*   _caCert = nullptr;
   bool          _debug         = false;
