@@ -17,11 +17,14 @@ System verdict: **NO-GO**. The complete cross-repository report is in the mqtt-p
 - [x] **TLS verification for mqtt.mariffb.my.** `MariffbPortal` and the portal-generated sketch
   use the bundled ISRG Root X1 through `secure(NODEBRIDGE_ISRG_ROOT_X1)`. The generic insecure
   quick-start API remains an accepted, documented option for other brokers.
-- [ ] **Validate/copy identifiers.** Device/root/key strings can alter topics, truncate the unique client-ID suffix, or make invalid JSON. `src/NodeBridge.cpp:52-58,216-228`.
+- [x] **Validate/copy identifiers.** Device/root/key segments are bounded, restricted to safe characters, and copied into library-owned storage.
 - [ ] **Outage responsiveness.** A failed synchronous MQTT connection can block for 5 seconds and retry after 3 seconds. Add exponential backoff/jitter; evaluate nonblocking transport for v2. `src/NodeBridge.cpp:81,100-112`.
-- [ ] **Presence semantics.** Two boards using one username/device topic have unique client IDs but share one retained LWT status; either board disconnecting can mark the shared device offline. Document one-board-per-account or add a distinct board ID to presence topics.
+- [x] **Presence semantics.** Documented one portal account/device name per physical board; unique MQTT client IDs still prevent client collisions.
 - [ ] **Documentation drift.** `docs/TEACHING.md` still says boards sharing `begin("esp32-demo")` collide, although v1.1.2 appends a chip ID. Update it to explain that MQTT client IDs are unique but topic/presence names may still be shared.
-- [ ] **Fresh compile CI.** Host parser tests pass, but `arduino-cli` was unavailable for this audit. Add ESP32/C3/S3 compile workflows for every release and representative examples.
+- [x] **Fresh compile CI configured.** GitHub Actions now runs strict host parser tests and
+  compiles BasicTelemetry + MariffbPortal on generic ESP32, XIAO ESP32-C3 and XIAO ESP32-S3
+  using ESP32 core 3.3.11 and PubSubClient 2.8.0. Keep this checked only if the first live
+  workflow run passes; local `arduino-cli` remains unavailable.
 
 ## Verified in this audit
 

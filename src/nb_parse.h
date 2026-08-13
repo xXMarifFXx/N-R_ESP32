@@ -14,6 +14,20 @@
 
 namespace nbparse {
 
+// A topic segment owned by NodeBridge: deliberately excludes MQTT separators
+// and wildcards, JSON punctuation, spaces and control bytes.
+inline bool validIdentifier(const char* s, size_t maxLen) {
+  if (!s || !*s) return false;
+  size_t n = 0;
+  for (; s[n]; ++n) {
+    const char c = s[n];
+    const bool ok = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
+                    (c >= '0' && c <= '9') || c == '_' || c == '-';
+    if (!ok || n >= maxLen) return false;
+  }
+  return n <= maxLen;
+}
+
 // Match an incoming topic against <root>/<device>/<key>/set. On success returns
 // true and points keyStart/keyLen at the <key> segment (within `topic`). Pure so
 // it can be unit-tested on the host; used by NodeBridge::_handleMessage.

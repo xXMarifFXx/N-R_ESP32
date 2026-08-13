@@ -96,6 +96,11 @@ The dashboard uses **Dashboard 2.0** (`@flowfuse/node-red-dashboard`). Install i
 |--------|---------|
 | `begin(deviceName)` | connect WiFi + MQTT (non-blocking after first try) |
 | `loop()` | call every iteration; maintains + auto-reconnects |
+
+Device names, roots, and telemetry/command keys are individual MQTT topic
+segments. Use only letters, digits, `_`, and `-`; device/root names are limited
+to 32 characters and keys to 48. The library copies these identifiers, so a
+temporary `String(...).c_str()` cannot leave a dangling topic pointer.
 | `connected()` | `true` when WiFi **and** MQTT are up |
 
 **Send telemetry** — overloaded for `float`, `double`, `int`, `long`, `bool`,
@@ -201,13 +206,18 @@ buzzer, RGB strip (R/G/B sliders) and OLED text.
 - Up to 16 `on()` handlers by default — raise with
   `#define NODEBRIDGE_MAX_SUBS 32` before `#include`.
 - Max payload 512 bytes by default — raise with `#define NODEBRIDGE_BUFFER_SIZE 1024`.
-- `String` keys/values are fine; keys passed to `on()`/`send()` should be string
-  literals or otherwise stay in scope.
-- **Config strings must outlive the bridge.** `wifi()`, `broker()`, `login()`, `root()`
-  and `begin()` store the *pointer* you pass, not a copy — use string literals or
-  variables that stay in scope (don't pass a temporary `String::c_str()`).
+- `String` keys/values are fine. Topic identifiers passed to `root()`, `begin()`,
+  and `on()` are validated and copied; `send()` uses its key immediately.
+- **Connection strings must outlive the bridge.** `wifi()`, `broker()`, and `login()`
+  store the pointers you pass — use string literals or variables that stay in scope
+  (don't pass a temporary `String::c_str()`).
 - **For production TLS, validate the certificate.** `secure()` with no argument does
   *not* verify the broker (MITM-able); pass `secure(rootCA)` and sync the clock via NTP.
+
+- Use one portal account/device name per physical board when relying on the
+  retained `status` topic. Client IDs are unique, so boards do not disconnect
+  each other, but two boards sharing one status topic cannot represent presence
+  independently.
   The library logs a warning when running unvalidated.
 
 ## Teaching a class with this?

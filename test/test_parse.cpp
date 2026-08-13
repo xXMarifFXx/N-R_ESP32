@@ -29,6 +29,13 @@ static void checkQuote(const char* in, const char* want) {
 }
 
 int main() {
+  printf("validIdentifier:\n");
+  if (!nbparse::validIdentifier("temperature_1", 48)) { printf("  valid key rejected << MISMATCH\n"); fails++; }
+  if (nbparse::validIdentifier("bad/key", 48)) { printf("  slash accepted << MISMATCH\n"); fails++; }
+  if (nbparse::validIdentifier("bad#key", 48)) { printf("  wildcard accepted << MISMATCH\n"); fails++; }
+  if (nbparse::validIdentifier("", 48)) { printf("  empty accepted << MISMATCH\n"); fails++; }
+  if (nbparse::validIdentifier("abcdefghijklmnopqrstuvwxyzABCDEFG", 32)) { printf("  overlength accepted << MISMATCH\n"); fails++; }
+
   printf("extractValue:\n");
   checkExtract("on", "on");
   checkExtract("off", "off");

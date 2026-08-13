@@ -30,6 +30,10 @@
 #define NODEBRIDGE_BUFFER_SIZE 512  // MQTT payload buffer (bytes)
 #endif
 
+#define NODEBRIDGE_MAX_DEVICE 32
+#define NODEBRIDGE_MAX_ROOT   32
+#define NODEBRIDGE_MAX_KEY    48
+
 // ----------------------------------------------------------------------------
 // Value  -  a tiny typed view of an incoming command payload.
 // You get one of these in every on(...) handler and read it however you like:
@@ -110,7 +114,7 @@ public:
   const char* deviceName() const { return _device; }
 
 private:
-  struct Sub { const char* key; CommandHandler handler; };
+  struct Sub { char key[NODEBRIDGE_MAX_KEY + 1]; CommandHandler handler; };
 
   // wiring
   WiFiClient       _net;         // plain transport
@@ -124,8 +128,10 @@ private:
   uint16_t    _port   = 0;        // 0 = auto-pick from _tls in begin()
   const char* _user   = nullptr;
   const char* _mpass  = nullptr;
-  const char* _root   = "devices";
-  const char* _device = "esp32";
+  char        _rootStorage[NODEBRIDGE_MAX_ROOT + 1] = "devices";
+  char        _deviceStorage[NODEBRIDGE_MAX_DEVICE + 1] = "esp32";
+  const char* _root   = _rootStorage;
+  const char* _device = _deviceStorage;
   char        _clientId[48] = {0};   // <device>-<chipid>, unique per board
   bool          _tls    = false;
   const char*   _caCert = nullptr;
@@ -134,6 +140,7 @@ private:
   unsigned long _hbInterval    = 0;
   unsigned long _lastHb        = 0;
   unsigned long _lastReconnect = 0;
+  unsigned long _reconnectDelay = 3000;
 
   EventHandler _onConnect    = nullptr;
   EventHandler _onDisconnect = nullptr;

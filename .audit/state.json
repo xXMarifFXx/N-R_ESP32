@@ -4,6 +4,7 @@
   "auditDate": "2026-08-13",
   "verdict": "NO-GO (system); library has 1 P1 and 6 P2 open",
   "portalCommit": "f8439cae9b44ae259a1ea7696521e19219c14abb",
+  "compileCI": "configured for generic ESP32, XIAO C3 and XIAO S3; first GitHub run pending",
   "verifiedGood": [
     "unique MQTT client ID per physical board",
     "host parser/topic tests pass with strict warnings",

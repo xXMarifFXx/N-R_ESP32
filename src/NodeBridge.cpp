@@ -27,7 +27,15 @@ NodeBridge& NodeBridge::login(const char* user, const char* password) {
 NodeBridge& NodeBridge::secure(const char* rootCA) {
   _tls = true; _caCert = rootCA; return *this;
 }
-NodeBridge& NodeBridge::root(const char* rootTopic) { _root = rootTopic; return *this; }
+NodeBridge& NodeBridge::root(const char* rootTopic) {
+  if (!nbparse::validIdentifier(rootTopic, NODEBRIDGE_MAX_ROOT)) {
+    _log("invalid root: use 1-32 letters, digits, _ or -");
+    return *this;
+  }
+  strncpy(_rootStorage, rootTopic, sizeof(_rootStorage) - 1);
+  _rootStorage[sizeof(_rootStorage) - 1] = '\0';
+  return *this;
+}
 NodeBridge& NodeBridge::heartbeat(unsigned long ms) { _hbInterval = ms; return *this; }
 NodeBridge& NodeBridge::keepAlive(uint16_t seconds) { _keepAlive = seconds ? seconds : 60; return *this; }
 NodeBridge& NodeBridge::debug(bool on) { _debug = on; return *this; }
@@ -35,8 +43,13 @@ NodeBridge& NodeBridge::onConnect(EventHandler cb) { _onConnect = cb; return *th
 NodeBridge& NodeBridge::onDisconnect(EventHandler cb) { _onDisconnect = cb; return *this; }
 
 NodeBridge& NodeBridge::on(const char* key, CommandHandler handler) {
+  if (!nbparse::validIdentifier(key, NODEBRIDGE_MAX_KEY)) {
+    _log("invalid command key: use 1-48 letters, digits, _ or -");
+    return *this;
+  }
   if (_subCount < NODEBRIDGE_MAX_SUBS) {
-    _subs[_subCount].key = key;
+    strncpy(_subs[_subCount].key, key, sizeof(_subs[_subCount].key) - 1);
+    _subs[_subCount].key[sizeof(_subs[_subCount].key) - 1] = '\0';
     _subs[_subCount].handler = handler;
     _subCount++;
   } else {
@@ -50,7 +63,16 @@ NodeBridge& NodeBridge::on(const char* key, CommandHandler handler) {
 // ---------------------------------------------------------------------------
 
 bool NodeBridge::begin(const char* deviceName) {
-  _device = deviceName;
+  if (!nbparse::validIdentifier(deviceName, NODEBRIDGE_MAX_DEVICE)) {
+    _log("begin failed: device must be 1-32 letters, digits, _ or -");
+    return false;
+  }
+  if (!_ssid || !_host) {
+    _log("begin failed: wifi() and broker() are required");
+    return false;
+  }
+  strncpy(_deviceStorage, deviceName, sizeof(_deviceStorage) - 1);
+  _deviceStorage[sizeof(_deviceStorage) - 1] = '\0';
   // Unique MQTT client id = device name + this board's chip id, so two boards that
   // share a device name never kick each other off the broker. Presence topics still
   // use the device name.
@@ -78,7 +100,7 @@ bool NodeBridge::begin(const char* deviceName) {
   _mqtt.setServer(_host, _port);
   _mqtt.setCallback(_trampoline);
   _mqtt.setBufferSize(NODEBRIDGE_BUFFER_SIZE);
-  _mqtt.setSocketTimeout(5);                      // bound blocking connect/read so loop() stays responsive
+  _mqtt.setSocketTimeout(3);                      // bound blocking connect/read so loop() stays responsive
   _mqtt.setKeepAlive(_keepAlive);                 // how long the broker waits before declaring us gone
 
   WiFi.mode(WIFI_STA);
@@ -104,7 +126,7 @@ void NodeBridge::loop() {
   if (!wifi) {
     _ensureWifi();
   } else if (!(mqtt = _mqtt.connected())) {
-    if (millis() - _lastReconnect > 3000) {
+    if (millis() - _lastReconnect >= _reconnectDelay) {
       _lastReconnect = millis();
       mqtt = _ensureMqtt();
     }
@@ -158,10 +180,18 @@ bool NodeBridge::_ensureMqtt() {
     : _mqtt.connect(_clientId, nullptr, nullptr, statusTopic, 0, true, "offline");
 
   if (ok) {
+    _reconnectDelay = 3000;
     _log("MQTT connected");
     _mqtt.publish(statusTopic, "online", true);   // retained presence
     _resubscribe();
   } else {
+    // Avoid hammering an unavailable broker and repeatedly blocking loop().
+    // A small per-board jitter prevents a whole classroom reconnecting at once.
+    const unsigned long jitter = (unsigned long)(ESP.getEfuseMac() & 0x3FF);
+    _reconnectDelay = _reconnectDelay < 30000 ? _reconnectDelay * 2 : 30000;
+    if (_reconnectDelay > 30000) _reconnectDelay = 30000;
+    _reconnectDelay += jitter;
+    if (_reconnectDelay > 31023) _reconnectDelay = 31023;
     if (_debug) { Serial.print(F("[NodeBridge] MQTT failed, rc=")); Serial.println(_mqtt.state()); }
   }
   return ok;
@@ -219,6 +249,10 @@ void NodeBridge::_topic(char* out, size_t n, const char* key, const char* suffix
 }
 
 bool NodeBridge::_publishValue(const char* key, const char* jsonValue) {
+  if (!nbparse::validIdentifier(key, NODEBRIDGE_MAX_KEY)) {
+    _log("send rejected: invalid key");
+    return false;
+  }
   if (!_mqtt.connected()) { _log("send skipped (offline)"); return false; }
   char topic[160], payload[NODEBRIDGE_BUFFER_SIZE];
   _topic(topic, sizeof(topic), key);
