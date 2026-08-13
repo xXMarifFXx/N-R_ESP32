@@ -1,0 +1,42 @@
+name: ESP32 compile matrix
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  host-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: g++ -std=c++11 -Wall -Wextra -pedantic -Isrc test/test_parse.cpp -o /tmp/test_parse
+      - run: /tmp/test_parse
+
+  compile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        fqbn:
+          - esp32:esp32:esp32
+          - esp32:esp32:XIAO_ESP32C3
+          - esp32:esp32:XIAO_ESP32S3
+        sketch:
+          - examples/BasicTelemetry
+          - examples/MariffbPortal
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/setup-arduino-cli@v2
+        with:
+          version: 1.5.0
+      - name: Install ESP32 core and dependency
+        run: |
+          arduino-cli core update-index
+          arduino-cli core install esp32:esp32@3.3.11
+          arduino-cli lib install "PubSubClient@2.8.0"
+      - name: Compile
+        run: arduino-cli compile --warnings all --fqbn "${{ matrix.fqbn }}" --library . "${{ matrix.sketch }}"
