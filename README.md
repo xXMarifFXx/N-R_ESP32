@@ -137,6 +137,22 @@ Point your Node-RED `mqtt-broker` node at the **same** cluster URL / port 8883, 
   ISRG Root X1). With validation on, sync the ESP32 clock via NTP first so cert-expiry
   checks pass. See the **HiveMQCloud** example for the full pattern.
 
+### mqtt.mariffb.my classroom portal
+
+Use the **MariffbPortal** example. On this broker, the portal username is also the
+authorized topic name, so these two values must match:
+
+```cpp
+.login(MQTT_USERNAME, MQTT_PASSWORD);
+bridge.begin(MQTT_USERNAME);  // devices/<username>/#
+```
+
+`begin()` does not become the raw MQTT client ID: the library automatically appends this
+board's chip ID. Therefore an ESP32, Node-RED and the browser console can all use the same
+account and topics without disconnecting one another, provided every client uses its own
+client ID. The bundled `NodeBridgeCerts.h` supplies the Let's Encrypt ISRG Root X1 used for
+full TLS certificate validation.
+
 ## Examples
 
 - **BasicTelemetry** — publish a reading every 2 s.
@@ -144,6 +160,7 @@ Point your Node-RED `mqtt-broker` node at the **same** cluster URL / port 8883, 
 - **SensorAndActuator** — the full picture: send data, receive commands, heartbeat, presence.
 - **HiveMQCloud** — connect to HiveMQ Cloud over TLS with username/password.
 - **MosquittoTLS** — connect to your own broker with full certificate validation (ISRG Root X1) + NTP.
+- **MariffbPortal** — ready-to-edit `mqtt.mariffb.my` example with validated TLS and the required username/topic mapping.
 
 ### Seeed Studio XIAO + Grove Starter Kit
 

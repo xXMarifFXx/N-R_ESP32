@@ -65,13 +65,16 @@ After step 3, every build for the rest of the day is **~30–60 s**.
 
 A shared cloud broker has two gotchas that will bite a class:
 
-1. **Every device needs a UNIQUE name.** The ESP32 uses its device name as its MQTT
-   **client ID**. If two students both use `begin("esp32-demo")`, they'll **kick each
-   other offline** (same client ID). Give each student a unique name:
+1. **Give every student a unique topic/device name.** Since v1.1.2 the raw MQTT client ID
+   automatically includes the board's chip ID, so copied sketches no longer kick one another
+   offline. A unique name is still important so students do not mix telemetry topics:
    ```cpp
    bridge.begin("esp32-aisha");   // or esp32-01, esp32-02, ...
    ```
    Then update their Node-RED flow topics to match (`devices/esp32-aisha/#`, etc.).
+
+   On **mqtt.mariffb.my**, use the student's portal username for this name because its ACL is
+   exactly `devices/<username>/#`: `bridge.begin(MQTT_USERNAME)`.
 
 2. **Free-tier connection limit.** HiveMQ Cloud's free *Serverless* plan allows about
    **25 concurrent connections per cluster**. Each ESP32 **and** each Node-RED counts

@@ -3,6 +3,15 @@
 All notable changes to **N-R_ESP32** are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versions are semver.
 
+## [1.1.3] - 2026-08-13
+### Fixed
+- MosquittoTLS now uses the MQTT username as `begin()` for username-scoped brokers, preventing
+  the “connected but publishes denied” mismatch.
+- Classroom guidance now reflects the unique per-board MQTT client IDs introduced in 1.1.2.
+### Added
+- `MariffbPortal`, a ready-to-edit `mqtt.mariffb.my` example with validated TLS.
+- `NodeBridgeCerts.h`, providing the Let's Encrypt ISRG Root X1 certificate for examples.
+
 ## [1.1.2] - 2026-08-11
 ### Fixed
 - **Unique client id per board.** The MQTT client id is now `<device>-<chipid>` instead of
@@ -84,6 +93,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versions are sem
   (HiveMQ Cloud). Only dependency: PubSubClient. Four examples.
 
 [1.1.2]: https://github.com/xXMarifFXx/N-R_ESP32/compare/1.1.1...1.1.2
+[1.1.3]: https://github.com/xXMarifFXx/N-R_ESP32/compare/1.1.2...1.1.3
 [1.1.1]: https://github.com/xXMarifFXx/N-R_ESP32/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/xXMarifFXx/N-R_ESP32/compare/1.0.4...1.1.0
 [1.0.4]: https://github.com/xXMarifFXx/N-R_ESP32/compare/1.0.3...1.0.4

@@ -1,14 +1,14 @@
 {
-  "lastAuditCommit": "d4fb21b6874a5721a5129a7afd87a64a7af72954",
-  "lastFullAuditCommit": "d4fb21b6874a5721a5129a7afd87a64a7af72954",
-  "auditDate": "2026-08-08",
-  "verdict": "GO",
+  "lastAuditCommit": "0be0a1661392b54c8b2213cf4e7a3d2f50c86e9c",
+  "lastFullAuditCommit": "0be0a1661392b54c8b2213cf4e7a3d2f50c86e9c",
+  "auditDate": "2026-08-13",
+  "verdict": "NO-GO (system); library has 1 P1 and 6 P2 open",
+  "portalCommit": "f8439cae9b44ae259a1ea7696521e19219c14abb",
   "verifiedGood": [
-    "src/NodeBridge.cpp: buffer bounds (snprintf/memcpy caps)",
-    "src/NodeBridge.cpp: millis() rollover handling",
-    "no committed secrets",
-    "MIT license compatibility with PubSubClient",
-    "clean compile -Wall -Wextra on esp32 3.3.11 and arduino:esp32 2.0.18",
-    "LWT presence"
+    "unique MQTT client ID per physical board",
+    "host parser/topic tests pass with strict warnings",
+    "bounded static buffers",
+    "60 second MQTT keepalive and automatic reconnect",
+    "no committed real credentials found"
   ]
 }
