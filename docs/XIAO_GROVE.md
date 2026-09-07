@@ -26,6 +26,7 @@ RP2040/RP2350 and nRF52840 XIAO boards have no Wi-Fi and are not supported.
 | 3-Axis Accel (LIS3DHTR) | GroveAccelerometer | `Grove-3-Axis-Digital-Accelerometer-2g-to-16g-LIS3DHTR` | I²C |
 | Light Sensor v1.2 | GroveLightSensor | — (analogRead) | A0 |
 | Rotary Angle | GroveRotaryAngle | — (analogRead) | A0 |
+| Moisture Sensor | GroveMoisture | — (analogRead) | A0 |
 | Mini PIR Motion | GrovePIRMotion | — (digitalRead) | D0 |
 | IR Receiver + remote | GroveIRReceiver | `IRremote` | D0 |
 | Servo | GroveServo | `ESP32Servo` | D0 |
