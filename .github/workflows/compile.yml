@@ -28,6 +28,7 @@ jobs:
         sketch:
           - examples/BasicTelemetry
           - examples/MariffbPortal
+          - examples/GroveMoisture
     steps:
       - uses: actions/checkout@v4
       - uses: arduino/setup-arduino-cli@v2
@@ -51,6 +52,7 @@ jobs:
           - examples/BasicTelemetry
           - examples/MariffbPortal
           - examples/UnoR4Telemetry
+          - examples/GroveMoisture
     steps:
       - uses: actions/checkout@v4
       - uses: arduino/setup-arduino-cli@v2
