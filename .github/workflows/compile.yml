@@ -1,4 +1,4 @@
-name: ESP32 compile matrix
+name: compile matrix
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
       - run: g++ -std=c++11 -Wall -Wextra -pedantic -Isrc test/test_parse.cpp -o /tmp/test_parse
       - run: /tmp/test_parse
 
-  compile:
+  compile-esp32:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
@@ -40,3 +40,26 @@ jobs:
           arduino-cli lib install "PubSubClient@2.8.0"
       - name: Compile
         run: arduino-cli compile --warnings all --fqbn "${{ matrix.fqbn }}" --library . "${{ matrix.sketch }}"
+
+  compile-unor4:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        sketch:
+          - examples/BasicTelemetry
+          - examples/MariffbPortal
+          - examples/UnoR4Telemetry
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/setup-arduino-cli@v2
+        with:
+          version: 1.5.0
+      - name: Install Renesas (UNO R4) core and dependency
+        run: |
+          arduino-cli core update-index
+          arduino-cli core install arduino:renesas_uno
+          arduino-cli lib install "PubSubClient@2.8.0"
+      - name: Compile
+        run: arduino-cli compile --warnings all --fqbn "arduino:renesas_uno:unor4wifi" --library . "${{ matrix.sketch }}"

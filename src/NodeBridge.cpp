@@ -73,11 +73,8 @@ bool NodeBridge::begin(const char* deviceName) {
   }
   strncpy(_deviceStorage, deviceName, sizeof(_deviceStorage) - 1);
   _deviceStorage[sizeof(_deviceStorage) - 1] = '\0';
-  // Unique MQTT client id = device name + this board's chip id, so two boards that
-  // share a device name never kick each other off the broker. Presence topics still
-  // use the device name.
-  snprintf(_clientId, sizeof(_clientId), "%s-%06X", _device,
-           (unsigned)(ESP.getEfuseMac() & 0xFFFFFF));
+  // The unique MQTT client id ("<device>-<chip id>") is built lazily in _ensureMqtt(),
+  // once WiFi is up: on the UNO R4 the MAC is only readable after the radio initialises.
   if (_self != nullptr && _self != this)
     _log("WARNING: multiple NodeBridge instances - only the last begin() receives commands");
   _self   = this;
@@ -85,6 +82,7 @@ bool NodeBridge::begin(const char* deviceName) {
   if (_port == 0) _port = _tls ? 8883 : 1883;   // auto-pick if not set
 
   if (_tls) {
+#if defined(ARDUINO_ARCH_ESP32)
     if (_caCert) {
       _netSecure.setCACert(_caCert);             // validate against provided root CA
       _log("TLS enabled (server certificate validated)");
@@ -92,6 +90,13 @@ bool NodeBridge::begin(const char* deviceName) {
       _netSecure.setInsecure();                  // encrypted but UNVALIDATED (quick start only)
       _log("TLS enabled - WARNING: server certificate NOT validated; pass secure(rootCA) for production");
     }
+#else
+    // UNO R4 WiFi: WiFiSSLClient validates against the CA bundle baked into the radio
+    // module's firmware; a per-sketch root CA cannot be installed. secure(rootCA) is
+    // still accepted for source compatibility, but the built-in bundle does the checking.
+    (void)_caCert;
+    _log("TLS enabled (UNO R4 validates via the module's built-in CA bundle)");
+#endif
     _mqtt.setClient(_netSecure);
   } else {
     _mqtt.setClient(_net);
@@ -103,7 +108,9 @@ bool NodeBridge::begin(const char* deviceName) {
   _mqtt.setSocketTimeout(3);                      // bound blocking connect/read so loop() stays responsive
   _mqtt.setKeepAlive(_keepAlive);                 // how long the broker waits before declaring us gone
 
-  WiFi.mode(WIFI_STA);
+#if defined(ARDUINO_ARCH_ESP32)
+  WiFi.mode(WIFI_STA);                             // UNO R4 WiFi is station-mode by default
+#endif
   WiFi.begin(_ssid, _pass);
 
   _log("connecting WiFi...");
@@ -169,6 +176,8 @@ bool NodeBridge::_ensureMqtt() {
   if (_mqtt.connected()) return true;
   if (WiFi.status() != WL_CONNECTED) return false;
 
+  if (_clientId[0] == '\0') _makeClientId();      // MAC is readable now that WiFi is up
+
   _log("connecting MQTT...");
 
   char statusTopic[160];
@@ -187,7 +196,7 @@ bool NodeBridge::_ensureMqtt() {
   } else {
     // Avoid hammering an unavailable broker and repeatedly blocking loop().
     // A small per-board jitter prevents a whole classroom reconnecting at once.
-    const unsigned long jitter = (unsigned long)(ESP.getEfuseMac() & 0x3FF);
+    const unsigned long jitter = (unsigned long)(_chipId24() & 0x3FF);
     _reconnectDelay = _reconnectDelay < 30000 ? _reconnectDelay * 2 : 30000;
     if (_reconnectDelay > 30000) _reconnectDelay = 30000;
     _reconnectDelay += jitter;
@@ -299,4 +308,21 @@ bool NodeBridge::connected() {
 
 void NodeBridge::_log(const char* msg) {
   if (_debug) { Serial.print(F("[NodeBridge] ")); Serial.println(msg); }
+}
+
+// Per-board 24-bit identifier used to disambiguate MQTT client ids.
+uint32_t NodeBridge::_chipId24() {
+#if defined(ARDUINO_ARCH_ESP32)
+  return (uint32_t)(ESP.getEfuseMac() & 0xFFFFFF);
+#else
+  uint8_t mac[6] = {0};
+  WiFi.macAddress(mac);                            // UNO R4: valid once WiFi has initialised
+  return ((uint32_t)mac[3] << 16) | ((uint32_t)mac[4] << 8) | (uint32_t)mac[5];
+#endif
+}
+
+// Build "<device>-<chipid>" once. Unique per board so two boards sharing a device
+// name never evict each other from the broker; presence topics keep the plain name.
+void NodeBridge::_makeClientId() {
+  snprintf(_clientId, sizeof(_clientId), "%s-%06X", _device, (unsigned)_chipId24());
 }

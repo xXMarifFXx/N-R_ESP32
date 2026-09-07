@@ -23,7 +23,27 @@ void loop() {
 }
 ```
 
-Works on **any ESP32 Arduino core version**. Only one dependency: **PubSubClient**.
+Only one dependency: **PubSubClient**.
+
+## Supported boards
+
+The same sketch runs on both:
+
+- **ESP32 family** — any Arduino-ESP32 core version, including the Seeed XIAO ESP32-C3 / ESP32-S3.
+- **Arduino UNO R4 WiFi** — Renesas RA4M1 with the ESP32-S3 radio (via the `WiFiS3` stack).
+
+The library picks the right WiFi + TLS stack automatically at compile time. The one
+difference to know about is **TLS**:
+
+| | ESP32 | Arduino UNO R4 WiFi |
+|---|---|---|
+| `secure()` | encrypted, **not** verified (quick start) | encrypted **and verified** via the module's built-in CA bundle |
+| `secure(rootCA)` | verified against the PEM you pass | accepted for compatibility; the built-in bundle verifies |
+| NTP clock needed? | yes, for cert validation | no — the radio module handles it |
+
+So on the UNO R4 you simply call `.secure()` and the connection is both encrypted and
+verified (its firmware bundle already trusts Let's Encrypt, so `mqtt.mariffb.my` works).
+See the **UnoR4Telemetry** example.
 
 ---
 

@@ -5,12 +5,17 @@
   IMPORTANT: MQTT_USERNAME is also passed to begin(); the portal authorizes only
   devices/<username>/#. The library still creates a unique MQTT client ID from
   this board's chip ID, so Node-RED and the portal console do not collide with it.
+
+  Runs on the ESP32 family AND the Arduino UNO R4 WiFi. On the UNO R4, TLS is
+  verified by the radio module's built-in CA bundle, so the root CA and the NTP
+  clock step below are ESP32-only.
 */
 
-#include <WiFi.h>
-#include <time.h>
 #include <NodeBridge.h>
 #include <NodeBridgeCerts.h>
+#if defined(ARDUINO_ARCH_ESP32)
+  #include <time.h>   // ESP32 checks the TLS cert against the system clock (NTP, below)
+#endif
 
 const char* WIFI_NAME = "YOUR_WIFI_SSID";
 const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
@@ -22,7 +27,10 @@ NodeBridge bridge;
 void setup() {
   Serial.begin(115200);
 
-  // TLS certificate validation needs a roughly correct clock.
+#if defined(ARDUINO_ARCH_ESP32)
+  // ESP32 validates the TLS certificate against the system clock, so set it via
+  // NTP before connecting. (The UNO R4 WiFi validates inside its radio module and
+  // needs no host clock — this whole block is skipped there.)
   WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_NAME, WIFI_PASSWORD);
   unsigned long wifiStarted = millis();
@@ -30,6 +38,7 @@ void setup() {
   configTime(0, 0, "pool.ntp.org", "time.nist.gov");
   unsigned long timeStarted = millis();
   while (time(nullptr) < 1700000000 && millis() - timeStarted < 15000) delay(200);
+#endif
 
   bridge.wifi(WIFI_NAME, WIFI_PASSWORD)
         .broker("mqtt.mariffb.my", 8883)

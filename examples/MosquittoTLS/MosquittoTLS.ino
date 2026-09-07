@@ -13,10 +13,11 @@
   Library: N-R_ESP32   (needs PubSubClient installed)
 */
 
-#include <WiFi.h>
-#include <time.h>
 #include <NodeBridge.h>
 #include <NodeBridgeCerts.h>
+#if defined(ARDUINO_ARCH_ESP32)
+  #include <time.h>   // ESP32 needs a real clock for cert validation (NTP, below)
+#endif
 
 const char* MQTT_USERNAME = "esp32user";
 
@@ -26,6 +27,7 @@ void setup() {
   Serial.begin(115200);
   pinMode(2, OUTPUT);
 
+#if defined(ARDUINO_ARCH_ESP32)
   // 1) WiFi up first (needed for NTP)
   WiFi.mode(WIFI_STA);
   WiFi.begin("YOUR_WIFI_SSID", "YOUR_WIFI_PASSWORD");
@@ -39,6 +41,10 @@ void setup() {
   time_t now = time(nullptr);
   while (now < 1700000000) { delay(300); Serial.print("."); now = time(nullptr); }
   Serial.println(" ok");
+#endif
+  // On the UNO R4 WiFi the radio module holds the trusted CA bundle and validates
+  // the certificate itself, so no host clock/NTP is needed — .secure(...) below
+  // still verifies the server (the passed root CA is ignored on the R4).
 
   // 3) Connect to your VPS Mosquitto with the CA -> certificate is VALIDATED.
   bridge.wifi("YOUR_WIFI_SSID", "YOUR_WIFI_PASSWORD")

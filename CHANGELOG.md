@@ -3,6 +3,32 @@
 All notable changes to **N-R_ESP32** are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versions are semver.
 
+## [1.2.0] - 2026-09-07
+### Added
+- **Arduino UNO R4 WiFi support.** The `NodeBridge` API now runs unchanged on the UNO R4 WiFi
+  (Renesas RA4M1 + ESP32-S3 radio) as well as the ESP32 family, via a compile-time board
+  abstraction (`WiFiS3`/`WiFiSSLClient` vs `WiFi`/`WiFiClientSecure`). `architectures` now
+  lists `esp32,renesas_uno`.
+- `UnoR4Telemetry` example, and `MariffbPortal`/`MosquittoTLS` now build for both boards.
+- CI compiles for `arduino:renesas_uno:unor4wifi` alongside the ESP32 matrix.
+### Changed
+- On the UNO R4, TLS is verified against the radio module's built-in CA bundle. `secure(rootCA)`
+  is accepted for source compatibility but the bundle does the checking; no NTP clock is needed.
+  On the ESP32, `secure(rootCA)` still validates against the supplied PEM and `secure()` stays
+  encrypted-but-unvalidated, exactly as before.
+- The unique MQTT client id is now derived portably (efuse MAC on ESP32, WiFi MAC on the UNO R4)
+  and built once WiFi is up. Behaviour on the ESP32 is unchanged.
+### Fixed
+- `keywords.txt` now colours `keepAlive` and the `NODEBRIDGE_MAX_*` / `NODEBRIDGE_ISRG_ROOT_X1` tokens.
+
+## [1.1.4] - 2026-08-13
+### Added
+- ESP32 compile-matrix CI (generic ESP32, XIAO C3, XIAO S3) plus host parser tests.
+- Verified `mqtt.mariffb.my` classroom example.
+### Fixed
+- Hardened topic identifiers: device/root/key are validated (letters, digits, `_`, `-` only)
+  and length-bounded before use, so they cannot break topic structure or overflow buffers.
+
 ## [1.1.3] - 2026-08-13
 ### Fixed
 - MosquittoTLS now uses the MQTT username as `begin()` for username-scoped brokers, preventing

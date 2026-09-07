@@ -1,12 +1,14 @@
 /*
-  NodeBridge.h  -  Dead-simple ESP32 <-> MQTT <-> Node-RED bridge
+  NodeBridge.h  -  Dead-simple <MCU> <-> MQTT <-> Node-RED bridge
 
   Part of the N-R_ESP32 library.
 
   Hides WiFi setup, MQTT connect/reconnect, topic naming, JSON encoding and
   presence (online/offline) so your sketch only contains your algorithm.
 
-  Works on any ESP32 Arduino core version.
+  Supported boards:
+    - ESP32 family (any Arduino-ESP32 core version, incl. Seeed XIAO C3/S3)
+    - Arduino UNO R4 WiFi (Renesas RA4M1 + ESP32-S3 radio, via WiFiS3)
 
   Dependency (install via Library Manager):
     - PubSubClient  by Nick O'Leary
@@ -18,8 +20,23 @@
 #define NODEBRIDGE_H
 
 #include <Arduino.h>
-#include <WiFi.h>
-#include <WiFiClientSecure.h>
+
+// ---- board abstraction: ESP32 family and Arduino UNO R4 WiFi ----------------
+// Each board brings a different WiFi stack and TLS client. We alias a common
+// PlainClient / SecureClient so the rest of the library is board-agnostic.
+#if defined(ARDUINO_ARCH_ESP32)
+  #include <WiFi.h>
+  #include <WiFiClientSecure.h>
+  namespace nbboard { typedef WiFiClient PlainClient; typedef WiFiClientSecure SecureClient; }
+#elif defined(ARDUINO_UNOR4_WIFI) || defined(ARDUINO_UNOWIFIR4) || \
+      defined(ARDUINO_ARCH_RENESAS) || defined(ARDUINO_ARCH_RENESAS_UNO)
+  #include <WiFiS3.h>
+  // UNO R4 WiFi validates TLS against the CA bundle in its radio-module firmware.
+  namespace nbboard { typedef WiFiClient PlainClient; typedef WiFiSSLClient SecureClient; }
+#else
+  #error "N-R_ESP32 supports the ESP32 family and the Arduino UNO R4 WiFi. Select one of those boards."
+#endif
+
 #include <PubSubClient.h>
 
 #ifndef NODEBRIDGE_MAX_SUBS
@@ -117,8 +134,8 @@ private:
   struct Sub { char key[NODEBRIDGE_MAX_KEY + 1]; CommandHandler handler; };
 
   // wiring
-  WiFiClient       _net;         // plain transport
-  WiFiClientSecure _netSecure;   // TLS transport
+  nbboard::PlainClient  _net;         // plain transport
+  nbboard::SecureClient _netSecure;   // TLS transport (board-specific)
   PubSubClient     _mqtt;
 
   // config
@@ -159,6 +176,8 @@ private:
   void   _topic(char* out, size_t n, const char* key, const char* suffix = nullptr);
   bool   _publishValue(const char* key, const char* jsonValue);
   void   _log(const char* msg);
+  uint32_t _chipId24();                 // 24-bit per-board id (efuse MAC on ESP32, WiFi MAC on UNO R4)
+  void     _makeClientId();             // build "<device>-<chipid>" once WiFi is up
 };
 
 #endif // NODEBRIDGE_H
